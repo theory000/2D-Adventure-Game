@@ -4,28 +4,47 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    public float speed = 0.1f;
+    
+    public bool vertical;
+    public float speed;
     Rigidbody2D rigidbody2d;
+
+    // Timer to change axis
+    public float changetime = 3.0f;
+    float timer;
+    int direction = -1;
+
     void Start()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
+        timer = changetime;
     }
 
-    void FixedUpdate()
-    {
+    void Update() {
+        timer -= Time.deltaTime;
+        if (timer < 0) {
+            direction = -direction;
+            timer = changetime;
+        }
+    }
+
+    void FixedUpdate() {
         Vector2 position = rigidbody2d.position;
-        position.x = position.x + speed * Time.deltaTime;
+
+        if (vertical) {
+            position.y = position.y + speed * direction * Time.deltaTime;
+        } else {
+            position.x = position.x + speed * direction * Time.deltaTime;
+        }
+
         rigidbody2d.MovePosition(position);
     }
 
-    void OnTriggerStay2D(Collider2D other)
-    {
-        PlayerController controller = other.GetComponent<PlayerController>();
-
-
-        if (controller != null)
-        {
-            controller.ChangeHealth(-1);
+    void OnCollisionEnter2D(Collision2D other) {
+        PlayerController player = other.gameObject.GetComponent<PlayerController>();
+        
+        if (player != null) {
+            player.ChangeHealth(-1);
         }
     }
 
