@@ -4,48 +4,69 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    
-    public bool vertical;
-    public float speed;
-    Rigidbody2D rigidbody2d;
+   // Public variables
+   public float speed;
+   public bool vertical;
+   public float changeTime = 3.0f;
+  
+   // Private variables
+   Rigidbody2D rigidbody2d;
+   Animator animator;
+   float timer;
+   int direction = -1;
 
-    // Timer to change axis
-    public float changetime = 3.0f;
-    float timer;
-    int direction = -1;
 
-    void Start()
-    {
-        rigidbody2d = GetComponent<Rigidbody2D>();
-        timer = changetime;
-    }
+   // Start is called before the first frame update
+   void Start()
+   {
+       rigidbody2d = GetComponent<Rigidbody2D>();
+       animator = GetComponent<Animator>();
+       timer = changeTime;
+      
+   }
 
-    void Update() {
-        timer -= Time.deltaTime;
-        if (timer < 0) {
-            direction = -direction;
-            timer = changetime;
-        }
-    }
 
-    void FixedUpdate() {
-        Vector2 position = rigidbody2d.position;
+  // FixedUpdate has the same call rate as the physics system
+  void FixedUpdate()
+  {
+      timer -= Time.deltaTime;
 
-        if (vertical) {
-            position.y = position.y + speed * direction * Time.deltaTime;
-        } else {
-            position.x = position.x + speed * direction * Time.deltaTime;
-        }
 
-        rigidbody2d.MovePosition(position);
-    }
+      if (timer < 0)
+      {
+           direction = -direction;
+           timer = changeTime;
+      }
+     
+       Vector2 position = rigidbody2d.position;
+     
+       if (vertical)
+       {
+           position.y = position.y + speed * direction * Time.deltaTime;
+           animator.SetFloat("Move X", 0);
+           animator.SetFloat("Move Y", direction);
+       }
+       else
+       {
+           position.x = position.x + speed * direction * Time.deltaTime;
+           animator.SetFloat("Move X", direction);
+           animator.SetFloat("Move Y", 0);
+       }
 
-    void OnCollisionEnter2D(Collision2D other) {
-        PlayerController player = other.gameObject.GetComponent<PlayerController>();
-        
-        if (player != null) {
-            player.ChangeHealth(-1);
-        }
-    }
+
+       rigidbody2d.MovePosition(position);
+  }
+
+
+   void OnCollisionEnter2D(Collision2D other)
+   {
+       PlayerController player = other.gameObject.GetComponent<PlayerController>();
+
+
+       if (player != null)
+       {
+           player.ChangeHealth(-1);
+       }
+   }
 
 }
