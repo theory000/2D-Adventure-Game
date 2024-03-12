@@ -28,11 +28,17 @@ public class PlayerController : MonoBehaviour
    // NPC commands
    public InputAction talkAction;
 
-
    // Variables related to projectile
    public GameObject projectilePrefab;
    public InputAction launchAction;
    public float ProjectileSpeed = 300;
+
+   // Varibales related to Player Audio
+   AudioSource audioSource;
+   public AudioClip launchingProjectile;
+   public AudioClip PlayerHit;
+   public AudioClip HealthPack;
+
 
   // Start is called before the first frame update
   void Start() {
@@ -45,6 +51,7 @@ public class PlayerController : MonoBehaviour
 
      rigidbody2d = GetComponent<Rigidbody2D>();
      animator = GetComponent<Animator>();
+     audioSource = GetComponent<AudioSource>();
 
      currentHealth = maxHealth;
   }
@@ -79,11 +86,14 @@ public class PlayerController : MonoBehaviour
       if (amount < 0)
          {
             if (isInvincible)
-                  return;
+               return;
           
             isInvincible = true;
             damageCooldown = timeInvincible;
             animator.SetTrigger("Hit");
+            PlaySound(PlayerHit);
+         } else {
+            PlaySound(HealthPack);
          }
 
       currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
@@ -96,6 +106,8 @@ public class PlayerController : MonoBehaviour
       Projectile projectile = projectileObject.GetComponent<Projectile>();
       projectile.Launch(moveDirection, ProjectileSpeed);
       animator.SetTrigger("Launch");
+
+      PlaySound(launchingProjectile);
    }
 
    void FindFriend(InputAction.CallbackContext context) {
@@ -108,5 +120,9 @@ public class PlayerController : MonoBehaviour
             UIHandler.instance.DisplayDialogue();
          }
       }
+   }
+
+   public void PlaySound(AudioClip clip) {
+      audioSource.PlayOneShot(clip);
    }
 }

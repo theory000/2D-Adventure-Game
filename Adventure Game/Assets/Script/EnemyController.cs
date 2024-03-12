@@ -10,6 +10,9 @@ public class EnemyController : MonoBehaviour
     public float speed;
     public bool vertical;
     public float changeTime = 3.0f;
+
+    public AudioClip Robotfix;
+    public AudioClip RobotShot;
   
     // Private variables
     Rigidbody2D rigidbody2d;
@@ -17,19 +20,20 @@ public class EnemyController : MonoBehaviour
     float timer;
     int direction = -1;
 
+    // Related to enemy audio
+    AudioSource audioSource;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        timer = changeTime;  
+        audioSource = GetComponent<AudioSource>(); 
+        timer = changeTime;
     }
 
 
     // FixedUpdate has the same call rate as the physics system
-    void FixedUpdate()
-    {
+    void FixedUpdate() {
         if(!aggressive) {
             return;
         }
@@ -60,21 +64,22 @@ public class EnemyController : MonoBehaviour
     }
 
 
-    void OnCollisionEnter2D(Collision2D other)
-    {
+    void OnCollisionEnter2D(Collision2D other) {
         PlayerController player = other.gameObject.GetComponent<PlayerController>();
-
 
         if (player != null)
         {
-           player.ChangeHealth(-1);
+            player.ChangeHealth(-1);
         }
     }
+
 
     public void Fix() {
         aggressive = false;
         animator.SetTrigger("Fixed");
         rigidbody2d.simulated = false;
+        audioSource.Stop();
+        audioSource.PlayOneShot(Robotfix);
     }
 
 }
